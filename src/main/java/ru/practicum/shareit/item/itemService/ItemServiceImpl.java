@@ -19,12 +19,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ItemServiceImpl implements ItemService{
+public class ItemServiceImpl implements ItemService {
 
     private final ItemDao itemDao;
     private final UserService userService;
     private final ItemMapper itemMapper;
-
 
     @Override
     public ItemDto addItem(Item item, Long userId) {

@@ -9,7 +9,6 @@ import ru.practicum.shareit.item.itemService.ItemService;
 
 import javax.validation.Valid;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/items")

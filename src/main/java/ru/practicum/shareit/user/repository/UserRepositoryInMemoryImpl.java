@@ -10,13 +10,14 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Repository
-public class UserRepositoryInMemoryImpl implements UserRepository{
+public class UserRepositoryInMemoryImpl implements UserRepository {
     private final Map<Long, User> users;
     private static long counter = 0;
 
     public UserRepositoryInMemoryImpl() {
         this.users = new HashMap<>();
     }
+
     @Override
     public User save(User user) {
         user.setId(++counter);
