@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
-import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.exceptions.UserNotOwnerException;
 import ru.practicum.shareit.item.itemDao.ItemDao;
 import ru.practicum.shareit.item.itemDto.ItemDto;

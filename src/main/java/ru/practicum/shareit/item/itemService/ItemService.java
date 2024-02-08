@@ -1,8 +1,5 @@
 package ru.practicum.shareit.item.itemService;
 
-import ru.practicum.shareit.exceptions.ItemNotFoundException;
-import ru.practicum.shareit.exceptions.UserNotFoundException;
-import ru.practicum.shareit.exceptions.UserNotOwnerException;
 import ru.practicum.shareit.item.itemDto.ItemDto;
 import ru.practicum.shareit.item.itemModel.Item;
 
