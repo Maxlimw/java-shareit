@@ -9,9 +9,9 @@ import ru.practicum.shareit.item.itemModel.Item;
 import java.util.List;
 
 public interface ItemService {
-    ItemDto addItem(Item item, Long userId) throws UserNotFoundException;
+    ItemDto addItem(Item item, Long userId);
 
-    ItemDto editItem(Item item, Long itemId, Long userId) throws ItemNotFoundException, UserNotOwnerException;
+    ItemDto editItem(Item item, Long itemId, Long userId);
 
     ItemDto getItem(Long id);
 

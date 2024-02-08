@@ -27,11 +27,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto addItem(Item item, Long userId) {
-        if (!userService.existsById(userId)) {
-            String errorMessage = String.format("Пользовать с id = %d не найден!", userId);
-            log.warn(errorMessage);
-            throw new UserNotFoundException(String.format(errorMessage));
-        }
+        userService.existsById(userId);
 
         item.setOwnerId(userId);
 
@@ -58,7 +54,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDto getItem(Long id) {
-        return itemMapper.toItemDto(itemDao.get(id));
+        Item item = itemDao.get(id);
+        if (item == null) {
+            String errorMessage = String.format("Вещь с id = %d не найдена!", id);
+            log.warn(errorMessage);
+            throw new ItemNotFoundException(errorMessage);
+        }
+        return itemMapper.toItemDto(item);
     }
 
     @Override
@@ -74,10 +76,13 @@ public class ItemServiceImpl implements ItemService {
             return new ArrayList<>();
         }
 
-        return itemDao.search(text.toLowerCase()).stream().map(itemMapper::toItemDto).collect(Collectors.toList());
+        return itemDao.search(text.toLowerCase())
+                .stream()
+                .map(itemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 
-    public boolean existsById(Long id) {
+    private boolean existsById(Long id) {
         return itemDao.getIdsList().contains(id);
     }
 }

@@ -33,11 +33,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(User user, Long userId) throws UserNotFoundException, EmailAlreadyExistsException {
-        if (!existsById(userId)) {
-            String errorMessage = String.format("Пользовать с id = %d не найден!", userId);
-            log.warn(errorMessage);
-            throw new UserNotFoundException(errorMessage);
-        }
+        existsById(userId);
 
         if (existsByEmail(user.getEmail()) && !getUser(userId).getEmail().equals(user.getEmail())) {
             String errorMessage = String.format("E-mail '%s' занят другим пользователем!", user.getEmail());
@@ -50,22 +46,27 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUser(Long id) throws UserNotFoundException {
-        if (!existsById(id)) {
+        User user = userRepository.get(id);
+        if (user == null) {
             String errorMessage = String.format("Пользовать с id = %d не найден!", id);
             log.warn(errorMessage);
             throw new UserNotFoundException(errorMessage);
         }
 
-        return userMapper.toUserDto(userRepository.get(id));
+        return userMapper.toUserDto(user);
     }
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userRepository.getAll().stream().map(userMapper::toUserDto).collect(Collectors.toList());
+        return userRepository.getAll().
+                stream()
+                .map(userMapper::toUserDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public void deleteUser(Long id) {
+        existsById(id);
         userRepository.delete(id);
     }
 
@@ -75,8 +76,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean existsById(Long id) {
-        return userRepository.getIdsList().contains(id);
+    public void existsById(Long id) {
+        User user = userRepository.get(id);
+        if (user == null) {
+            String errorMessage = String.format("Пользовать с id = %d не найден!", id);
+            log.warn(errorMessage);
+            throw new UserNotFoundException(errorMessage);
+        }
     }
-
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.itemDto.ItemDto;
+import ru.practicum.shareit.item.itemMapper.ItemMapper;
 import ru.practicum.shareit.item.itemModel.Item;
 import ru.practicum.shareit.item.itemService.ItemService;
 
@@ -15,16 +16,19 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemService itemService;
+    private final ItemMapper itemMapper;
 
     @PostMapping
-    public ResponseEntity<ItemDto> addItem(@Valid @RequestBody Item item, @RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<ItemDto> addItem(@Valid @RequestBody ItemDto itemDto, @RequestHeader("X-Sharer-User-Id") Long userId) {
+        Item item = itemMapper.toItem(itemDto);
         return ResponseEntity.ok().body(itemService.addItem(item, userId));
     }
 
     @PatchMapping("/{itemId}")
-    public ResponseEntity<ItemDto> editItem(@RequestBody Item item,
+    public ResponseEntity<ItemDto> editItem(@RequestBody ItemDto itemDto,
                                             @PathVariable("itemId") Long itemId,
                                             @RequestHeader("X-Sharer-User-Id") Long userId)  {
+        Item item = itemMapper.toItem(itemDto);
         return ResponseEntity.ok().body(itemService.editItem(item, itemId, userId));
     }
 

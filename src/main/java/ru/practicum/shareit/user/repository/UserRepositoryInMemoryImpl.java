@@ -56,11 +56,17 @@ public class UserRepositoryInMemoryImpl implements UserRepository {
 
     @Override
     public List<String> getEmailsList() {
-        return users.values().stream().map(User::getEmail).collect(Collectors.toList());
+        return users.values()
+                .stream()
+                .map(User::getEmail)
+                .collect(Collectors.toList());
     }
 
     @Override
     public List<Long> getIdsList() {
-        return users.values().stream().map(User::getId).collect(Collectors.toList());
+        return users.values()
+                .stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
     }
 }

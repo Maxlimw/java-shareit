@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemDaoImpl implements ItemDao {
     private final Map<Long, Item> items;
-    private static long counter;
+    private long counter;
 
     @Override
     public Item save(Item item) {
@@ -57,9 +57,9 @@ public class ItemDaoImpl implements ItemDao {
     @Override
     public List<Item> search(String text) {
         return items.values().stream()
-                .filter(item -> item.getAvailable().equals(true))
-                .filter(item -> item.getName().toLowerCase().contains(text) ||
-                        item.getDescription().toLowerCase().contains(text))
+                .filter(item -> item.getAvailable() != null && item.getAvailable())
+                .filter(item -> (item.getName() != null && item.getName().toLowerCase().contains(text)) ||
+                        (item.getDescription() != null && item.getDescription().toLowerCase().contains(text)))
                 .collect(Collectors.toList());
     }
 
