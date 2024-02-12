@@ -1,9 +1,11 @@
 package ru.practicum.shareit.user.service;
 
+import org.springframework.stereotype.Service;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import java.util.List;
 
+@Service
 public interface UserService {
 
     UserDto createUser(User user);
@@ -16,7 +18,4 @@ public interface UserService {
 
     void deleteUser(Long id);
 
-    boolean existsByEmail(String email);
-
-    void existsById(Long id);
 }
