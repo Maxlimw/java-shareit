@@ -18,6 +18,7 @@ import ru.practicum.shareit.exceptions.NotAvailableForBookingException;
 import ru.practicum.shareit.exceptions.UserNotFoundException;
 import ru.practicum.shareit.item.itemModel.Item;
 import ru.practicum.shareit.item.itemRepository.ItemRepository;
+import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import javax.validation.ValidationException;
@@ -44,15 +45,14 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingDto add(BookingInputDto bookingInputDto, Long userId) {
-        checkUserExistence(userId);
-        checkItemExistence(bookingInputDto);
-
+        User user = checkUserExistence(userId);
+        Item item = checkItemExistence(bookingInputDto);
         validate(bookingInputDto, userId);
 
         Booking booking = bookingMapper.toBooking(bookingInputDto);
         booking.setStatus(Status.WAITING);
-        booking.setItem(itemRepository.getReferenceById(bookingInputDto.getItemId()));
-        booking.setBooker(userRepository.getReferenceById(userId));
+        booking.setItem(item);
+        booking.setBooker(user);
 
         return bookingMapper.toBookingDto(bookingRepository.save(booking));
     }
@@ -60,9 +60,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     @Override
     public BookingDto updateStatus(Long bookingId, Boolean approved, Long userId) {
-        checkBookingExistence(bookingId);
-
-        Booking booking = bookingRepository.getReferenceById(bookingId);
+        Booking booking = checkBookingExistence(bookingId);
 
         if (!isOwner(userId, booking)) {
             String errorMessage = String.format("У пользователя c id = %d нет вещи c id = %d!", userId,
@@ -192,28 +190,32 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    private void checkUserExistence(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            String errorMessage = String.format("Пользователь c id = %d не найден!", userId);
-            log.warn(errorMessage);
-            throw new UserNotFoundException(errorMessage);
-        }
+    private User checkUserExistence(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    String errorMessage = String.format("Пользователь c id = %d не найден!", userId);
+                    log.warn(errorMessage);
+                    return new UserNotFoundException(errorMessage);
+                });
     }
 
-    private void checkItemExistence(BookingInputDto bookingInputDto) {
-        if (!itemRepository.existsById(bookingInputDto.getItemId())) {
-            String errorMessage = String.format("Вещь с id = %d не найдена!", bookingInputDto.getItemId());
-            log.warn(errorMessage);
-            throw new ItemNotFoundException(errorMessage);
-        }
+    private Item checkItemExistence(BookingInputDto bookingInputDto) {
+        Long itemId = bookingInputDto.getItemId();
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> {
+                    String errorMessage = String.format("Вещь с id = %d не найдена!", itemId);
+                    log.warn(errorMessage);
+                    return new ItemNotFoundException(errorMessage);
+                });
     }
 
-    private void checkBookingExistence(Long bookingId) {
-        if (!bookingRepository.existsById(bookingId)) {
-            String errorMessage = String.format("Бронирование с id = %d не найдено!", bookingId);
-            log.warn(errorMessage);
-            throw new BookingNotFoundException(errorMessage);
-        }
+    private Booking checkBookingExistence(Long bookingId) {
+        return bookingRepository.findById(bookingId)
+                .orElseThrow(() -> {
+                    String errorMessage = String.format("Бронирование с id = %d не найдено!", bookingId);
+                    log.warn(errorMessage);
+                    return new BookingNotFoundException(errorMessage);
+                });
     }
 
     private boolean isOwner(Long userId, Booking booking) {
