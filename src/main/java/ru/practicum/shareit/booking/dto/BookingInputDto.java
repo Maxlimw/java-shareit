@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class BookingInputDto {
 
+    @NotNull(message = "Не указан id вещи (itemId)!")
     private Long itemId;
 
     @FutureOrPresent

@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
             log.warn(errorMessage);
             throw new EmailAlreadyExistsException(errorMessage);
         }
-        User oldUser = userRepository.getReferenceById(userId);
+        User oldUser = userRepository.getById(userId);
 
         if (user.getName() != null) {
             oldUser.setName(user.getName());
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(errorMessage);
         }
 
-        return userMapper.toUserDto(userRepository.getReferenceById(id));
+        return userMapper.toUserDto(userRepository.getById(id));
     }
 
     @Override
