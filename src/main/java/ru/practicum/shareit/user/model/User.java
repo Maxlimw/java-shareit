@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 @Data
 @Entity
@@ -19,7 +20,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
+    @NotNull(message = "Не указано имя пользователя (name)!")
+    @NotBlank(message = "Не указано имя пользователя (name)!")
     private String name;
 
     @NotNull(message = "Не указан адрес электронной почты (email)!")

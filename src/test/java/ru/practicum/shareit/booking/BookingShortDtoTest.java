@@ -22,15 +22,16 @@ public class BookingShortDtoTest {
 
     @Test
     void testJsonBookingShortDto() throws Exception {
-        BookingShortDto bookingShortDto = new BookingShortDto(
-                1L,2L,
-                LocalDateTime.of(2030, 12, 25, 12, 0),
-                LocalDateTime.of(2030, 12, 26, 12, 0));
+        BookingShortDto booking = new BookingShortDto();
+        booking.setId(1L);
+        booking.setBookerId(2L);
+        booking.setStartTime(LocalDateTime.of(2030, 12, 25, 12, 0, 0));
+        booking.setEndTime(LocalDateTime.of(2030, 12, 25, 14, 0, 0));
 
-        JsonContent<BookingShortDto> result = json.write(bookingShortDto);
-        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
+        JsonContent<BookingShortDto> result = json.write(booking);
+        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1); // Проверка значения id
         assertThat(result).extractingJsonPathNumberValue("$.bookerId").isEqualTo(2);
-        assertThat(result).extractingJsonPathStringValue("$.start").isEqualTo("2030-12-25T12:00:00");
-        assertThat(result).extractingJsonPathStringValue("$.end").isEqualTo("2030-12-26T12:00:00");
+        assertThat(result).extractingJsonPathStringValue("$.startTime").isEqualTo("2030-12-25T12:00:00");
+        assertThat(result).extractingJsonPathStringValue("$.endTime").isEqualTo("2030-12-25T14:00:00");
     }
 }
