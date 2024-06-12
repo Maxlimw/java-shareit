@@ -29,8 +29,8 @@ public class BookingShortDtoTest {
 
         JsonContent<BookingShortDto> result = json.write(bookingShortDto);
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
+        assertThat(result).extractingJsonPathNumberValue("$.bookerId").isEqualTo(2);
         assertThat(result).extractingJsonPathStringValue("$.start").isEqualTo("2030-12-25T12:00:00");
         assertThat(result).extractingJsonPathStringValue("$.end").isEqualTo("2030-12-26T12:00:00");
-        assertThat(result).extractingJsonPathNumberValue("$.bookerId").isEqualTo(2);
     }
 }
