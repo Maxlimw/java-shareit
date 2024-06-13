@@ -31,15 +31,4 @@ public class PageRequestUtils {
 
         return pageRequest;
     }
-
-    public static PageRequest getPageRequest(Integer from, Integer size) {
-        PageRequest pageRequest = PageRequest.of(0, Integer.MAX_VALUE);
-
-        if (from != null && size != null) {
-            validatePageRequestParams(from, size);
-            pageRequest = PageRequest.of(from / size, size);
-        }
-
-        return pageRequest;
-    }
 }
