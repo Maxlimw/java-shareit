@@ -65,10 +65,10 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = checkBookingExistence(bookingId);
 
         if (!isOwner(userId, booking)) {
-            String errorMessage = String.format("У пользователя c id = %d нет вещи c id = %d!", userId,
+            String errorMessage = String.format("Статус бронирования может изменить только владелец вещи с id = %d!",
                     booking.getItem().getId());
             log.warn(errorMessage);
-            throw new ItemNotFoundException(errorMessage);
+            throw new BookingNotFoundException(errorMessage);
         }
 
         if (WAITING.equals(booking.getStatus()) && approved) {

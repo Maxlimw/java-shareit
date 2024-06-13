@@ -10,6 +10,7 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import javax.validation.ValidationException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -56,6 +57,16 @@ class UserServiceTest {
                 () -> userService.updateUser(newUser, newUser.getId()));
         assertEquals(String.format("E-mail '%s' занят другим пользователем!", newUser.getEmail()),
                 exception.getMessage());
+    }
+
+    @Test
+    void shouldExceptionWhenUpdateUserWithEmailInWrongFormat() {
+        UserDto returnUserDto = userService.createUser(user);
+        user.setEmail("wrong_format");
+
+        final ValidationException exception = assertThrows(ValidationException.class,
+                () -> userService.updateUser(user, returnUserDto.getId()));
+        assertEquals(exception.getMessage(), "Неверный формат поля email!");
     }
 
     @Test

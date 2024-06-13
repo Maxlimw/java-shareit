@@ -5,6 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import ru.practicum.shareit.exceptions.ItemNotFoundException;
@@ -19,6 +21,7 @@ import ru.practicum.shareit.user.service.UserService;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -136,5 +139,29 @@ public class ItemServiceTest {
                 () -> itemService.addComment(commentDto, itemDto.getId(), newUserDto.getId()));
         assertEquals(String.format("Пользователь с id = %d никогда не бронировал вещь с id = %d!", newUserDto.getId(),
                 itemDto.getId()), exp.getMessage());
+    }
+
+    @Test
+    void shouldAddComment() {
+        UserDto ownerDto = userService.createUser(user1);
+        UserDto bookerDto = userService.createUser(user2);
+        ItemDto itemDto = itemService.addItem(itemDto1, ownerDto.getId());
+
+        BookingInputDto bookingInputDto = new BookingInputDto(itemDto.getId(), LocalDateTime.now().plusSeconds(1),
+                LocalDateTime.now().plusSeconds(3));
+
+        BookingDto bookingDto = bookingService.add(bookingInputDto, bookerDto.getId());
+        bookingService.updateStatus(bookingDto.getId(), true, ownerDto.getId());
+
+        try {
+            sleep(5000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        CommentDto commentDto = new CommentDto(1L, "comment1", bookerDto.getName(), LocalDateTime.now());
+        itemService.addComment(commentDto, itemDto.getId(), bookerDto.getId());
+
+        assertEquals(1, itemService.getItems(0, 10, ownerDto.getId()).get(0).getComments().size());
     }
 }
