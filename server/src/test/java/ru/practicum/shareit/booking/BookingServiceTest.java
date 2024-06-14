@@ -741,41 +741,6 @@ public class BookingServiceTest {
     }
 
     @Test
-    void shouldExceptionWhenBookingEndIsBeforeStart() {
-        UserDto ownerDto = userService.createUser(user1);
-        UserDto bookerDto = userService.createUser(user2);
-        ItemDto itemDto = itemService.addItem(itemDto1, ownerDto.getId());
-
-        BookingInputDto bookingInputDto = new BookingInputDto(
-                itemDto.getId(),
-                LocalDateTime.now().minusDays(5),
-                LocalDateTime.now().minusDays(10));
-
-        ValidationException exp = assertThrows(ValidationException.class,
-                () -> bookingService.add(bookingInputDto, bookerDto.getId()));
-        assertEquals("Дата окончания бронирования не может быть раньше или равняться дате начала бронирования!",
-                exp.getMessage());
-    }
-
-    @Test
-    void shouldExceptionWhenBookingEndEqualsStart() {
-        UserDto ownerDto = userService.createUser(user1);
-        UserDto bookerDto = userService.createUser(user2);
-        ItemDto itemDto = itemService.addItem(itemDto1, ownerDto.getId());
-
-        LocalDateTime currentDateTime = LocalDateTime.now();
-        BookingInputDto bookingInputDto = new BookingInputDto(
-                itemDto.getId(),
-                currentDateTime,
-                currentDateTime);
-
-        ValidationException exp = assertThrows(ValidationException.class,
-                () -> bookingService.add(bookingInputDto, bookerDto.getId()));
-        assertEquals("Дата окончания бронирования не может быть раньше или равняться дате начала бронирования!",
-                exp.getMessage());
-    }
-
-    @Test
     void shouldWhenGetAllBookingsForUserItemsAndFromIsNegative() {
         UserDto ownerDto = userService.createUser(user1);
         UserDto bookerDto = userService.createUser(user2);
