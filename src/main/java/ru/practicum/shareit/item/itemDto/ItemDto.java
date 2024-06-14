@@ -1,27 +1,30 @@
 package ru.practicum.shareit.item.itemDto;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
+import ru.practicum.shareit.user.dto.UserDto;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
+@NoArgsConstructor
 public class ItemDto {
 
     private Long id;
 
-    @NotEmpty
+    @NotBlank(message = "Название (name) вещи не должно быть пустым!")
     private String name;
 
-    @NotEmpty
+    @NotBlank(message = "Описание (description) вещи не должно быть пустым!")
     private String description;
 
-    @NotNull
+    @NotNull(message = "Не указан статус (available) вещи!")
     private Boolean available;
+
+    private UserDto owner;
 
     private Long requestId;
 
@@ -30,4 +33,13 @@ public class ItemDto {
     private BookingShortDto nextBooking;
 
     private List<CommentDto> comments;
+
+    public ItemDto(Long id, String name, String description, Boolean available, UserDto owner, List<CommentDto> comments) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.available = available;
+        this.owner = owner;
+        this.comments = comments;
+    }
 }

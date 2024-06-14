@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.itemService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
@@ -18,6 +19,8 @@ import ru.practicum.shareit.item.itemModel.Comment;
 import ru.practicum.shareit.item.itemModel.Item;
 import ru.practicum.shareit.item.itemRepository.CommentRepository;
 import ru.practicum.shareit.item.itemRepository.ItemRepository;
+import ru.practicum.shareit.page.PageRequestUtils;
+import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -40,6 +43,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemMapper itemMapper;
     private final CommentMapper commentMapper;
     private final BookingMapper bookingMapper;
+    private static final Sort ID_SORT = Sort.by("id");
 
 
     @Transactional
@@ -48,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
         checkUserExistence(userId);
 
         Item item = itemMapper.toItem(itemDto);
-        item.setOwner(userRepository.getReferenceById(userId));
+        item.setOwner(userRepository.getById(userId));
 
         return itemMapper.toItemDto(itemRepository.save(item));
     }
@@ -59,7 +63,7 @@ public class ItemServiceImpl implements ItemService {
         checkUserExistence(userId);
         checkItemExistence(itemId);
 
-        Item item = itemRepository.getReferenceById(itemId);
+        Item item = itemRepository.getById(itemId);
 
         if (!userId.equals(item.getOwner().getId())) {
             String errorMessage = String.format("У пользователя c id = %d нет вещи с id = %d!", userId, itemId);
@@ -87,7 +91,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto getItem(Long itemId, Long userId) {
         checkItemExistence(itemId);
 
-        Item item = itemRepository.getReferenceById(itemId);
+        Item item = itemRepository.getById(itemId);
         ItemDto itemDto = itemMapper.toItemDto(item);
 
         if (isOwner(userId, itemId)) {
@@ -102,8 +106,10 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> getItems(Long userId) {
-        List<ItemDto> allItems = itemRepository.findByOwnerId(userId).stream()
+    public List<ItemDto> getItems(Integer from, Integer size, Long userId) {
+        PageRequest pageRequest = PageRequestUtils.getPageRequest(from, size, ID_SORT);
+
+        List<ItemDto> allItems = itemRepository.findByOwnerId(userId, pageRequest).stream()
                 .map(itemMapper::toItemDto)
                 .sorted(Comparator.comparing(ItemDto::getId))
                 .collect(Collectors.toList());
@@ -127,12 +133,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(readOnly = true)
     @Override
-    public List<ItemDto> search(String text) {
+    public List<ItemDto> search(String text, Integer from, Integer size) {
         if (text.isBlank()) {
             return new ArrayList<>();
         }
+        PageRequest pageRequest = PageRequestUtils.getPageRequest(from, size, ID_SORT);
 
-        return itemRepository.search(text.toLowerCase()).stream()
+        return itemRepository.search(text.toLowerCase(), pageRequest).stream()
                 .map(itemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
@@ -154,8 +161,8 @@ public class ItemServiceImpl implements ItemService {
         }
 
         Comment comment = commentMapper.toComment(commentDto);
-        comment.setItem(itemRepository.getReferenceById(itemId));
-        comment.setAuthor(userRepository.getReferenceById(userId));
+        comment.setItem(itemRepository.getById(itemId));
+        comment.setAuthor(userRepository.getById(userId));
         comment.setCreated(dateTime);
 
         return commentMapper.toCommentDto(commentRepository.save(comment));
@@ -178,7 +185,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private boolean isOwner(Long userId, Long itemId) {
-        return itemRepository.getReferenceById(itemId).getOwner().getId().equals(userId);
+        return itemRepository.getById(itemId).getOwner().getId().equals(userId);
     }
 
     private Booking getLastBooking(Long itemId, LocalDateTime dateTime) {

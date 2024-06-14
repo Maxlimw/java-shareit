@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.itemModel;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -10,6 +11,7 @@ import java.util.List;
 @Data
 @Entity
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "items")
 public class Item {
 
@@ -18,6 +20,7 @@ public class Item {
         private Long id;
 
         private String name;
+
 
         private String description;
 
@@ -34,7 +37,4 @@ public class Item {
         @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
         private List<Comment> comments;
 
-        public Item() {
-
-        }
 }

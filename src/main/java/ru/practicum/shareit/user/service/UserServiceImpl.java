@@ -10,8 +10,14 @@ import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidationException;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
+import javax.validation.Validator;
 
 @Service
 @Slf4j
@@ -20,6 +26,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private static final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Override
     @Transactional
@@ -37,13 +44,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto updateUser(User user, Long userId) throws UserNotFoundException, EmailAlreadyExistsException {
         userRepository.existsById(userId);
+        validateUser(user);
 
         if (userRepository.existsByEmail(user.getEmail()) && !getUser(userId).getEmail().equals(user.getEmail())) {
             String errorMessage = String.format("E-mail '%s' занят другим пользователем!", user.getEmail());
             log.warn(errorMessage);
             throw new EmailAlreadyExistsException(errorMessage);
         }
-        User oldUser = userRepository.getReferenceById(userId);
+        User oldUser = userRepository.getById(userId);
 
         if (user.getName() != null) {
             oldUser.setName(user.getName());
@@ -64,7 +72,7 @@ public class UserServiceImpl implements UserService {
             throw new UserNotFoundException(errorMessage);
         }
 
-        return userMapper.toUserDto(userRepository.getReferenceById(id));
+        return userMapper.toUserDto(userRepository.getById(id));
     }
 
     @Override
@@ -79,5 +87,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
+    }
+
+    private void validateUser(User user) {
+        if (user.getEmail() != null) {
+            Set<ConstraintViolation<User>> violations = validator.validateProperty(user, "email");
+            if (violations.size() != 0) {
+                throw new ValidationException(violations.iterator().next().getMessage());
+            }
+        }
     }
 }
