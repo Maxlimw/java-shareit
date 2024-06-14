@@ -25,9 +25,9 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto userDto, @PathVariable("userId") Long userId) {
+    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable("userId") Long userId) {
         User user = userMapper.toUser(userDto);
-        return ResponseEntity.ok().body(userService.updateUser(user, userId));
+        return userService.updateUser(user, userId);
     }
 
     @GetMapping("/{userId}")

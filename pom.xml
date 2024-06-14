@@ -27,7 +27,7 @@
 	<modules>
 		<module>gateway</module>
 		<module>server</module>
-	</modules>
+    </modules>
 
 	<dependencies>
 		<dependency>
