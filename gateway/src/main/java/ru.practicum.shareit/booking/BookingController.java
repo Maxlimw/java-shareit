@@ -17,6 +17,7 @@ import ru.practicum.shareit.booking.dto.BookItemRequestDto;
 import ru.practicum.shareit.booking.dto.BookingState;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
@@ -33,6 +34,7 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<Object> createBooking(@RequestHeader(USER_ID_HEADER) Long userId,
                                                 @RequestBody @Valid BookItemRequestDto requestDto) {
+        validateBookingDates(requestDto);
         log.info("Пользователь с id = {} отправил запрос на создание бронирования: {}", userId, requestDto);
         return bookingClient.createBooking(userId, requestDto);
     }
@@ -75,5 +77,13 @@ public class BookingController {
         log.info("Пользователь с id = {} отправил запрос на получение списка бронирований co state = {} на вещи, для " +
                 "которых он является владельцем (from = {}, size = {})", userId, stateParam, from, size);
         return bookingClient.getBookingForUserItems(userId, state, from, size);
+    }
+
+    private void validateBookingDates(BookItemRequestDto bookingItemRequestDto) {
+        if (bookingItemRequestDto.getEnd().isBefore(bookingItemRequestDto.getStart())
+                || bookingItemRequestDto.getEnd().equals(bookingItemRequestDto.getStart())) {
+            log.warn("Дата окончания бронирования не может быть раньше или равняться дате начала бронирования!");
+            throw new ValidationException("Дата окончания бронирования не может быть раньше или равняться дате начала бронирования!");
+        }
     }
 }

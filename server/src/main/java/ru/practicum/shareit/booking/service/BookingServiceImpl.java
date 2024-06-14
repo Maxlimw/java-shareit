@@ -247,12 +247,5 @@ public class BookingServiceImpl implements BookingService {
             log.warn(errorMessage);
             throw new BookingNotFoundException(errorMessage);
         }
-
-        if (bookingInputDto.getEnd().isBefore(bookingInputDto.getStart())
-                || bookingInputDto.getEnd().equals(bookingInputDto.getStart())) {
-            log.warn("Дата окончания бронирования не может быть раньше или равняться дате начала бронирования!");
-            throw new ValidationException("Дата окончания бронирования не может быть раньше или равняться дате " +
-                    "начала бронирования!");
-        }
     }
 }
